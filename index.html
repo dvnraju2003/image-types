@@ -1,95 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>Image Classifier</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-
-<h1>Food Image Classifier</h1>
-<h3>Simple app that classifies images</h3>
-
-<p>
-The inference backend is running on <a href="https://huggingface.co/spaces/dvnraju2003/firsthit">a HuggingFace Space</a>. This is a static web page that fetches the responses from the HF+Gradio API.
-<br/>
-</p>
-
-<p>
-<h4> Please select an image on your device below. The inference happens automatically after a file selection</h4>
-</p>
-
-<br/>
-
-<input id="image-input" type="file" />
-
-<div id="result-container">
-  <div>
-    <h4>
-	No predictions yet
-    </h4>
-  </div>
-</div>
-
-<script>
-var apiURL = 'https://hf.space/embed/jph00/testing/+/api/predict/';
-
-var input = document.getElementById('image-input');
-var result = document.getElementById('result-container');
-
-input.onchange = function() {
-  const reader = new FileReader();
-  reader.onloadend = function() {
-    var b64 = reader.result;
-    fetch_gradio_response(b64)
-      .then(format_response_predictions);
-  };
-
-  const file = input.files[0];
-  reader.readAsDataURL(file);
-};
-
-const fetch_gradio_response = function(img64) {
-  return fetch(apiURL, {
-    method: "POST",
-    body: JSON.stringify({
-      "data": [img64]
-    }),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  }).then(function(response) {
-    return response.json();
-  })
-};
-
-const format_response_predictions = function(json_response) {
-
-  const resultDiv = document.createElement('div');
-  resultDiv.setAttribute('id', 'response-result');
-
-  json_response.data.forEach(function(d) {
-    const predictedText = `Predicted label : ${d.label}`
-
-    const predictedLabelNode = document.createElement('h4');
-    predictedLabelNode.textContent = predictedText;
-    resultDiv.appendChild(predictedLabelNode);
-
-    const confidencesUL = document.createElement('ul');
-
-    d.confidences.forEach(function(c) {
-      confidenceText = `${c.label}: ${c.confidence*100}%`
-
-      var confidenceLI = document.createElement('li');
-      confidenceLI.textContent = confidenceText;
-      confidencesUL.appendChild(confidenceLI);
-    });
-
-    resultDiv.appendChild(confidencesUL);
-  });
-  result.replaceChild(resultDiv, result.firstElementChild);
-};
-</script>
-
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cat or Dog predictor</title>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+  </head>
+  <body>
+    <header>
+        <h1>Predict a dog or cat from an image</h1>
+        <p>Model provided by <a href="https://github.com/fastai/fastai">fastai</a> and api hosted by <a href="https://hf.space/embed/jph00/testing/api" target="_blank">hugging face</a>
+        </p>
+        <a href="https://github.com/dvnraju2003/image-types" target="_blank">Github Repo</a>
+    </header>
+    <main>
+        <header>
+            <h2>Submit a picture of either a cat or dog</h2>
+            <p id="prediction"></p>
+            <p id="confidences"></p>
+            <p id="error"></p>
+        </header>
+        <section>
+            <img id="myImage" height="400" width="400">
+            <form id="form">
+                <label for="fileInput"></label>
+                <input id="fileInput" type="file" onchange="onFileSelected(event)" name="File">
+            </form>
+        </section>
+    </main>
+	<script src="index.js"></script>
+  </body>
 </html>
